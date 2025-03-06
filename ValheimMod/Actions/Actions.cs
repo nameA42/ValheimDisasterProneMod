@@ -93,7 +93,7 @@ namespace ValheimTwitch.Events
                 {
                     typ = help.actions.Find(x => x.act == name);
                 }
-                writeToFile($"We Got {typ.act}");
+                writeToFile($"{typ.act}");
                 switch (typ.type)
                 {
                     case "spawn":
