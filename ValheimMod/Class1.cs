@@ -10,6 +10,7 @@ using ValheimTwitch.Helpers;
 using ValheimTwitch.Patches;
 using System.Collections.Generic;
 using static Interpolate;
+using UnityEngine.PlayerLoop;
 
 namespace NarcRandomMod
 {
@@ -38,6 +39,13 @@ namespace NarcRandomMod
         public bool MetLock = false;
         public bool Smol = false;
         public bool timMsgLock = false;
+        public bool HS = false;
+        public bool HSLock = false;
+        public bool Warping = false;
+        public bool WarpingLock = false;
+        public bool Vommiting = false;
+        public bool VomitLock = false;
+        public bool falldmg = true;
 
         private static NarcRandoMod instance;
 
@@ -67,8 +75,9 @@ namespace NarcRandomMod
 
             Assembly assembly = Assembly.GetExecutingAssembly();
             HarmonyInstance.PatchAll(assembly);
-            Log.Info("finished Wake");
+            Log.Info("Awakened");
         }
+
         [HarmonyPatch(typeof(Player), "FixedUpdate")]
         public static class PlayerFUAdd
         {
@@ -87,6 +96,22 @@ namespace NarcRandomMod
                 if (Input.GetKeyDown(KeyCode.Backslash))
                 {
                     ConsoleUpdatePatch.AddAction(PlayerAction.Meteor);
+                    Log.Info("Meteor");
+                }
+                if (Input.GetKeyDown(KeyCode.Keypad2))
+                {
+                    PlayerAction.Warp();
+                    Log.Info("Warp");
+                }
+                if (Input.GetKeyDown(KeyCode.Keypad3))
+                {
+                    ConsoleUpdatePatch.AddAction(PlayerAction.HealSurroundings);
+                    Log.Info("HS");
+                }
+                if (Input.GetKeyDown(KeyCode.Keypad4))
+                {
+                    Log.Info("MoonJump");
+                    ConsoleUpdatePatch.AddAction(PlayerAction.Moon);
                 }
                 if (Input.GetKeyDown(KeyCode.Keypad0))
                 {
@@ -100,7 +125,7 @@ namespace NarcRandomMod
                 }
                 if (Input.GetKeyDown(KeyCode.KeypadMinus))
                 {
-                    Actions.RunAction(Random.Range(0, 3));
+                    Actions.RunAction();
                     Log.Info("DebugAct");
                 }
                 //Time.timeScale = Instance.timscal;
@@ -112,7 +137,7 @@ namespace NarcRandomMod
                 }
                 if (instance.delay >= instance.Fulldelay)
                 {
-                    Actions.RunAction(Random.Range(0, 3));
+                    Actions.RunAction();
                     instance.delay = 0f;
                     if(instance.Smol)
                     {
@@ -158,5 +183,6 @@ namespace NarcRandomMod
 
             Player.m_localPlayer.Message(type1, $"{msg}\n");
         }
+
     }
 }

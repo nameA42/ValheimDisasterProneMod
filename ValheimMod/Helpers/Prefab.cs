@@ -46,7 +46,7 @@ namespace ValheimTwitch.Helpers
             znview.GetZDO().Set($"{NarcRandoMod.pluginGUID}-name", name);
         }
 
-        public static void Spawn(string type, int level = 1, float offset = 100, bool tamed = false, string name = null, bool above = false)
+        public static void Spawn(string type, int level = 1, float offset = 100, bool tamed = false, string name = null, bool above = false, int hp = -1)
         {
             try
             {
@@ -75,6 +75,7 @@ namespace ValheimTwitch.Helpers
                     position += Vector3.up * 50f;
                 }
                 var instance = UnityEngine.Object.Instantiate(prefab, position, Quaternion.identity);
+                Log.Info("Spawning instance called " + instance.name);
 
                 //var renderer = instance.GetComponentInChildren<SkinnedMeshRenderer>();
                 //renderer.material = ZNetScene.instance.GetPrefab("Blob").GetComponentInChildren<SkinnedMeshRenderer>().material;
@@ -109,6 +110,12 @@ namespace ValheimTwitch.Helpers
 
                 if (level > 0)
                     character.SetLevel(level);
+
+
+                if (hp > 0)
+                {
+                    character.SetHealth(hp);
+                }
             }
             catch (Exception ex)
             {

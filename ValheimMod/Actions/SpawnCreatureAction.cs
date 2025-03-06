@@ -7,9 +7,36 @@ using HarmonyLib;
 using NarcRandomMod;
 using static MeleeWeaponTrail;
 using System.Threading.Tasks;
+using System.Collections;
 
 namespace ValheimTwitch.Events
 {
+    internal class SpawnCreatureConfig
+    {
+        public string act;
+        public string creature;
+        public int level;
+        public int count;
+        public int offset;
+
+        public SpawnCreatureConfig()
+        {
+            this.act = "";
+            this.creature = "";
+            this.level = 0;
+            this.count = 0;
+            this.offset = 0;
+        }
+
+        public SpawnCreatureConfig(string act, string creature, int level, int count, int offset)
+        {
+            this.act = act;
+            this.creature = creature;
+            this.level = level;
+            this.count = count;
+            this.offset = offset;
+        }
+    }
     internal class SpawnCreatureAction
     {
         public static List<string> untameableCreatures = new List<string>
@@ -27,39 +54,56 @@ namespace ValheimTwitch.Events
         "Bonemass", "Dragon", "GoblinKing"
     };
 
-        public static List<List<int>> sets = new List<List<int>> {
-            new List<int> { 11, 1, 5, 10 },
-            new List<int> { 35, 1, 3, 10 },
-            new List<int> { 30, 1, 3, 10 }
+        public static List<SpawnCreatureConfig> sets = new List<SpawnCreatureConfig> {
+            new SpawnCreatureConfig("fish", "Fish1", 1, 5, 10),
+            new SpawnCreatureConfig("troll", "Troll", 1, 1, 10),
+            new SpawnCreatureConfig("skeleton", "Skeleton", 1, 3, 10),
+            new SpawnCreatureConfig("dragon","Dragon", 1, 100, 10)
         };
-        internal static void Run()
+
+        public float level = 1f;
+        public float count = 1f;
+        public float offset = 1f;
+        internal static void Run(string act = "")
         {
-
+            var almost = false;
             var set = sets[Random.Range(0, sets.Count)];
-            var creature = set[0];
-            var level = set[1];
-            var count = set[2];
-            var offset = set[3];
+            if(act != "")
+            {
+                set = sets.Find(x => x.act == act);
+            }
+            var creature = set.creature;
+            if (creature == "Dragon")
+            {
+                almost = true;
+                set = sets[Random.Range(0, sets.Count)];
+                creature = set.creature;
+            }
+            var level = set.level;
+            var count = set.count;
+            var offset = set.offset;
             var tamed = false;
-
-            var type = creatures[creature];
 
 
             if (Player.m_localPlayer != null)
             {
                 var type1 = MessageHud.MessageType.Center;
-                var msg = $"Here is a {type} just for you (:";
+                var msg = $"Here is a {creature} just for you (:\n";
+                if(almost & creature != "Dragon")
+                {
+                    msg += "\n but it could have been worse (:<\n";
+                }
 
-                Player.m_localPlayer.Message(type1, $"{msg}\n");
+                Player.m_localPlayer.Message(type1, $"{msg}");
             }
 
-            if (creature == 11)
+            if (set.act == "fish")
             {
                 NarcRandoMod.Instance.fishig = true;
             }
-            if (creature == 30)
+            if (set.act == "skeleton")
             {
-                EnvMan.instance.m_debugEnv = "DeepForest Mist";
+                EnvMan.instance.m_debugEnv = "Misty";
                 Task.Delay(2 * 60000).ContinueWith(t => EnvMan.instance.m_debugEnv = "");
                 NarcRandoMod.Instance.skel = true;
 
@@ -68,7 +112,7 @@ namespace ValheimTwitch.Events
             {
                 for (int i = 0; i < count; i++)
                 {
-                    ConsoleUpdatePatch.AddAction(() => Prefab.Spawn(type, level, offset, tamed));
+                    Prefab.Spawn(creature, level, offset, tamed, hp: 1);
                 }
             }
         }
@@ -78,22 +122,22 @@ namespace ValheimTwitch.Events
         {
             public static void Postfix(Player __instance)
             {
-                if (NarcRandoMod.Instance.fishig & NarcRandoMod.Instance.delay >= NarcRandoMod.Instance.Fulldelay -1)
+                if (NarcRandoMod.Instance.fishig & NarcRandoMod.Instance.delay >= 115)
                 {
                     NarcRandoMod.Instance.fishig = false;
                     NarcRandoMod.Instance.fishigLock = false;
-                    ItemDrop[] array2 = UnityEngine.Object.FindObjectsOfType<ItemDrop>();
+                    Character[] array2 = UnityEngine.Object.FindObjectsOfType<Character>();
                     for (int i = 0; i < array2.Length; i++)
                     {
                         ZNetView component = array2[i].GetComponent<ZNetView>();
-                        if (component)
+                        if (component & array2[i].name == "Fish1")
                         {
                             component.Destroy();
                         }
                     }
                     Log.Info("Items Cleared");
                 }
-                if (NarcRandoMod.Instance.fishig & NarcRandoMod.Instance.delay% 2 < 0.2 & !NarcRandoMod.Instance.fishigLock)
+                if (NarcRandoMod.Instance.fishig & NarcRandoMod.Instance.delay% 2 < 0.5 & !NarcRandoMod.Instance.fishigLock)
                 {
                     for (int i = 0; i < 5; i++)
                     {
@@ -105,16 +149,23 @@ namespace ValheimTwitch.Events
                 {
                     NarcRandoMod.Instance.fishigLock = false;
                 }
-                if (NarcRandoMod.Instance.skel & NarcRandoMod.Instance.delay >= 110)
+                if (NarcRandoMod.Instance.skel & NarcRandoMod.Instance.delay >= 115)
                 {
                     NarcRandoMod.Instance.skel = false;
                     NarcRandoMod.Instance.skelLock = false;
                 }
-                if (NarcRandoMod.Instance.skel & NarcRandoMod.Instance.delay % 20 < 0.2 & !NarcRandoMod.Instance.skelLock)
+                if (NarcRandoMod.Instance.skel & NarcRandoMod.Instance.delay % 20 < 0.5 & !NarcRandoMod.Instance.skelLock)
                 {
-                    for (int i = 0; i < 3; i++)
+                    for (int i = 0; i < 4; i++)
                     {
-                        ConsoleUpdatePatch.AddAction(() => Prefab.Spawn("Skeleton", 1, 3, false));
+                        if(i > 0)
+                        {
+                            ConsoleUpdatePatch.AddAction(() => Prefab.Spawn("Skeleton", 1, 10, false, hp:1));
+                        }
+                        else
+                        {
+                            ConsoleUpdatePatch.AddAction(() => Prefab.Spawn("Skeleton", 1, 10, false));
+                        }
                     }
                     NarcRandoMod.Instance.skelLock = true;
                 }
