@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using NarcRandomMod;
 
 namespace ValheimTwitch.Events
 {
@@ -51,7 +52,8 @@ namespace ValheimTwitch.Events
         public List<Act> actions = new List<Act>
         {
             new Act("puke", 1f, "player"), new Act("heal", 1f, "player"), new Act("meteor", 1f, "player"), 
-            new Act("baby", 1f, "player"), new Act("HS", 1f, "player"), new Act("warp", 1f, "player"), 
+            new Act("baby", 1f, "player"), new Act("regeneration", 1f, "player"), 
+            //new Act("warp", 1f, "player"), 
             new Act("moongrav", 1f, "player"),
             new Act("fish", 1f, "spawn"), new Act("skeleton", 1f, "spawn"), new Act("troll", 1.2f, "spawn"), new Act("dragon", 0.1f, "spawn"),
             new Act("thunderstorm", 1f, "weather"), new Act("blizzard", 0.6f, "weather")
@@ -82,6 +84,15 @@ namespace ValheimTwitch.Events
             string path = Directory.GetCurrentDirectory() + "/DisasterProne.txt";
             Log.Warning("Wrote to path: " + path);
             File.WriteAllLines(path, new string[]{s});
+        }
+
+        public static void incrementUp()
+        {
+            NarcRandoMod.Instance.worldLevel += 1;
+        }
+        public static void incrementDown()
+        {
+            NarcRandoMod.Instance.worldLevel -= 1;
         }
         internal static void RunAction(string name = "")
         {

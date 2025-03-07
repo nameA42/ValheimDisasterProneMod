@@ -112,7 +112,7 @@ namespace ValheimTwitch.Events
             {
                 for (int i = 0; i < count; i++)
                 {
-                    Prefab.Spawn(creature, level, offset, tamed, hp: 1);
+                    Prefab.Spawn(creature, level, offset, tamed);
                 }
             }
         }
@@ -126,16 +126,6 @@ namespace ValheimTwitch.Events
                 {
                     NarcRandoMod.Instance.fishig = false;
                     NarcRandoMod.Instance.fishigLock = false;
-                    Character[] array2 = UnityEngine.Object.FindObjectsOfType<Character>();
-                    for (int i = 0; i < array2.Length; i++)
-                    {
-                        ZNetView component = array2[i].GetComponent<ZNetView>();
-                        if (component & array2[i].name == "Fish1")
-                        {
-                            component.Destroy();
-                        }
-                    }
-                    Log.Info("Items Cleared");
                 }
                 if (NarcRandoMod.Instance.fishig & NarcRandoMod.Instance.delay% 2 < 0.5 & !NarcRandoMod.Instance.fishigLock)
                 {
@@ -172,6 +162,22 @@ namespace ValheimTwitch.Events
                 if (NarcRandoMod.Instance.skel & NarcRandoMod.Instance.delay % 20 > 1)
                 {
                     NarcRandoMod.Instance.skelLock = false;
+                }
+                if (NarcRandoMod.Instance.delay >= 115)
+                {
+                    foreach (Character Mob in NarcRandoMod.Instance.currentMobs)
+                    {
+                        try
+                        {
+                            Log.Info(Mob.gameObject.name);
+                            Mob.GetComponent<ZNetView>().Destroy();
+                        }
+                        catch
+                        {
+                            Log.Info("Failed to Destroy");
+                        }
+                    }
+                    Log.Info("Enemies Cleared");
                 }
             }
         }

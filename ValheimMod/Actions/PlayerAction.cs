@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ValheimTwitch.Events
 {
-    internal class PlayerAction
+    class PlayerAction
     {
         private static GameObject GO_Meteor;
         private static GameObject GO_Meteor2;
@@ -38,7 +38,7 @@ namespace ValheimTwitch.Events
                 case "baby":
                     ConsoleUpdatePatch.AddAction(baby);
                     break;
-                case "HS":
+                case "regeneration":
                     Log.Info("HealSur");
                     NarcRandoMod.Instance.HS = true;
                     doMSG("Regeneration for others");
@@ -57,7 +57,7 @@ namespace ValheimTwitch.Events
             }
         }
 
-        static void doMSG(string s)
+        public static void doMSG(string s)
         {
             if (Player.m_localPlayer != null)
             {
@@ -119,7 +119,7 @@ namespace ValheimTwitch.Events
             {
                 if (item != Player.m_localPlayer)
                 {
-                    item.Heal(item.GetMaxHealth() / 5);
+                    item.Heal(item.GetMaxHealth());
                 }
             }
         }
@@ -234,12 +234,12 @@ namespace ValheimTwitch.Events
                     NarcRandoMod.Instance.HS = false;
                     NarcRandoMod.Instance.HSLock = false;
                 }
-                if (NarcRandoMod.Instance.HS & NarcRandoMod.Instance.delay % 20 < 0.5 & !NarcRandoMod.Instance.HSLock)
+                if (NarcRandoMod.Instance.HS & NarcRandoMod.Instance.delay % 10 < 0.5 & !NarcRandoMod.Instance.HSLock)
                 {
                     ConsoleUpdatePatch.AddAction(HealSurroundings);
                     NarcRandoMod.Instance.HSLock = true;
                 }
-                if (NarcRandoMod.Instance.HS & NarcRandoMod.Instance.delay % 20 > 1)
+                if (NarcRandoMod.Instance.HS & NarcRandoMod.Instance.delay % 10 > 1)
                 {
                     NarcRandoMod.Instance.HSLock = false;
                 }

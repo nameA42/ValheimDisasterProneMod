@@ -76,7 +76,6 @@ namespace ValheimTwitch.Helpers
                 }
                 var instance = UnityEngine.Object.Instantiate(prefab, position, Quaternion.identity);
                 Log.Info("Spawning instance called " + instance.name);
-
                 //var renderer = instance.GetComponentInChildren<SkinnedMeshRenderer>();
                 //renderer.material = ZNetScene.instance.GetPrefab("Blob").GetComponentInChildren<SkinnedMeshRenderer>().material;
 
@@ -87,6 +86,7 @@ namespace ValheimTwitch.Helpers
                 }
 
                 var character = instance.GetComponent<Character>();
+                NarcRandoMod.Instance.currentMobs.Add(character);
 
                 if (character == null)
                     return;

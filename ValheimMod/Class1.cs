@@ -47,6 +47,10 @@ namespace NarcRandomMod
         public bool VomitLock = false;
         public bool falldmg = true;
 
+        public int worldLevel = 1;
+
+        public List<Character> currentMobs = new List<Character>();
+
         private static NarcRandoMod instance;
 
         public static NarcRandoMod Instance
@@ -98,6 +102,10 @@ namespace NarcRandomMod
                     ConsoleUpdatePatch.AddAction(PlayerAction.Meteor);
                     Log.Info("Meteor");
                 }
+                if (Input.GetKeyDown(KeyCode.KeypadDivide))
+                {
+                    Actions.RunAction();
+                }
                 if (Input.GetKeyDown(KeyCode.Keypad2))
                 {
                     PlayerAction.Warp();
@@ -125,8 +133,30 @@ namespace NarcRandomMod
                 }
                 if (Input.GetKeyDown(KeyCode.KeypadMinus))
                 {
-                    Actions.RunAction();
-                    Log.Info("DebugAct");
+                    PlayerAction.doMSG("Increasing World Level");
+                    Actions.incrementUp();
+                    Log.Info("LevelUp");
+                }
+                if (Input.GetKeyDown(KeyCode.KeypadPlus))
+                {
+                    Actions.incrementDown();
+                    Log.Info("LevelDown");
+                }
+                if (Input.GetKeyDown(KeyCode.KeypadMultiply))
+                {
+                    foreach (Character Mob in NarcRandoMod.Instance.currentMobs)
+                    {
+                        try
+                        {
+                            Log.Info(Mob.gameObject.name);
+                            Mob.GetComponent<ZNetView>().Destroy();
+                        }
+                        catch
+                        {
+                            Log.Info("Failed to Destroy");
+                        }
+                    }
+                    Log.Info("Enemies Cleared");
                 }
                 //Time.timeScale = Instance.timscal;
                 //Log.Info("updating");
