@@ -156,6 +156,7 @@ namespace NarcRandomMod
                             Log.Info("Failed to Destroy");
                         }
                     }
+                    NarcRandoMod.Instance.currentMobs.Clear();
                     Log.Info("Enemies Cleared");
                 }
                 //Time.timeScale = Instance.timscal;

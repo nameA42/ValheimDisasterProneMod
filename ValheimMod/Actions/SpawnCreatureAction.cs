@@ -177,6 +177,7 @@ namespace ValheimTwitch.Events
                             Log.Info("Failed to Destroy");
                         }
                     }
+                    NarcRandoMod.Instance.currentMobs.Clear();
                     Log.Info("Enemies Cleared");
                 }
             }
