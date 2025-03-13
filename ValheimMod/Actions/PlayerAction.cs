@@ -61,7 +61,6 @@ namespace ValheimTwitch.Events
         {
             if (Player.m_localPlayer != null)
             {
-                Player.m_localPlayer.ClearFood();
                 var type1 = MessageHud.MessageType.Center;
 
                 Player.m_localPlayer.Message(type1, $"{s}\n");

@@ -18,6 +18,7 @@ namespace ValheimTwitch.Events
         public int level;
         public int count;
         public int offset;
+        public int RampInd;
 
         public SpawnCreatureConfig()
         {
@@ -26,6 +27,7 @@ namespace ValheimTwitch.Events
             this.level = 0;
             this.count = 0;
             this.offset = 0;
+            this.RampInd = -1;
         }
 
         public SpawnCreatureConfig(string act, string creature, int level, int count, int offset)
@@ -35,6 +37,17 @@ namespace ValheimTwitch.Events
             this.level = level;
             this.count = count;
             this.offset = offset;
+            this.RampInd = -1;
+        }
+
+        public SpawnCreatureConfig(string act, string creature, int level, int count, int offset, int ind = -1)
+        {
+            this.act = act;
+            this.creature = creature;
+            this.level = level;
+            this.count = count;
+            this.offset = offset;
+            this.RampInd = ind;
         }
     }
     internal class SpawnCreatureAction
@@ -56,9 +69,15 @@ namespace ValheimTwitch.Events
 
         public static List<SpawnCreatureConfig> sets = new List<SpawnCreatureConfig> {
             new SpawnCreatureConfig("fish", "Fish1", 1, 5, 10),
-            new SpawnCreatureConfig("troll", "Troll", 1, 1, 10),
-            new SpawnCreatureConfig("skeleton", "Skeleton", 1, 3, 10),
-            new SpawnCreatureConfig("dragon","Dragon", 1, 100, 10)
+            new SpawnCreatureConfig("troll", "Troll", 1, 1, 10, 0),
+            new SpawnCreatureConfig("skeleton", "Skeleton", 1, 3, 10, 1),
+            new SpawnCreatureConfig("dragon","Dragon", 1, 100, 10),
+            new SpawnCreatureConfig("logs", "beech_log_half", 1, 3, 10),
+        };
+
+        public static List<List<int>> Ramping = new List<List<int>> {
+            new List<int> {1, 2, 4, 8, 10, 12, 14},
+            new List<int> {1, 2, 4, 8, 16, 24, 24},
         };
 
         public float level = 1f;
@@ -83,7 +102,11 @@ namespace ValheimTwitch.Events
             var count = set.count;
             var offset = set.offset;
             var tamed = false;
-
+            if(set.RampInd != -1)
+            {
+                Log.Warning("ramped to " + Ramping[set.RampInd][NarcRandoMod.Instance.worldLevel] + " for " + creature);
+                count = Ramping[set.RampInd][NarcRandoMod.Instance.worldLevel];
+            }
 
             if (Player.m_localPlayer != null)
             {
@@ -100,6 +123,10 @@ namespace ValheimTwitch.Events
             if (set.act == "fish")
             {
                 NarcRandoMod.Instance.fishig = true;
+            }
+            if (set.act == "logs")
+            {
+                NarcRandoMod.Instance.Logging = true;
             }
             if (set.act == "skeleton")
             {
@@ -146,39 +173,53 @@ namespace ValheimTwitch.Events
                 }
                 if (NarcRandoMod.Instance.skel & NarcRandoMod.Instance.delay % 20 < 0.5 & !NarcRandoMod.Instance.skelLock)
                 {
-                    for (int i = 0; i < 4; i++)
+                    for (int i = 0; i < Ramping[1][NarcRandoMod.Instance.worldLevel]; i++)
                     {
-                        if(i > 0)
-                        {
-                            ConsoleUpdatePatch.AddAction(() => Prefab.Spawn("Skeleton", 1, 10, false, hp:1));
-                        }
-                        else
-                        {
                             ConsoleUpdatePatch.AddAction(() => Prefab.Spawn("Skeleton", 1, 10, false));
-                        }
                     }
                     NarcRandoMod.Instance.skelLock = true;
                 }
-                if (NarcRandoMod.Instance.skel & NarcRandoMod.Instance.delay % 20 > 1)
+                if (NarcRandoMod.Instance.skel & NarcRandoMod.Instance.delay % 10 > 1)
                 {
                     NarcRandoMod.Instance.skelLock = false;
                 }
+                if (NarcRandoMod.Instance.Logging & NarcRandoMod.Instance.delay >= 115)
+                {
+                    NarcRandoMod.Instance.Logging = false;
+                    NarcRandoMod.Instance.LogLock = false;
+                }
+                if (NarcRandoMod.Instance.Logging & NarcRandoMod.Instance.delay % 5 < 0.5 & !NarcRandoMod.Instance.LogLock)
+                {
+                    for (int i = 0; i < 5; i++)
+                    {
+                        ConsoleUpdatePatch.AddAction(() => Prefab.Spawn("beech_log_half", 1, 5, false, above:true));
+                    }
+                    NarcRandoMod.Instance.LogLock = true;
+                }
+                if (NarcRandoMod.Instance.Logging & NarcRandoMod.Instance.delay % 10 > 1)
+                {
+                    NarcRandoMod.Instance.LogLock = false;
+                }
                 if (NarcRandoMod.Instance.delay >= 115)
                 {
-                    foreach (Character Mob in NarcRandoMod.Instance.currentMobs)
+                    if (NarcRandoMod.Instance.currentMobs.Count > 0)
                     {
-                        try
+                        Log.Info("Running Clear on " + NarcRandoMod.Instance.currentMobs.Count);
+                        foreach (Character Mob in NarcRandoMod.Instance.currentMobs)
                         {
-                            Log.Info(Mob.gameObject.name);
-                            Mob.GetComponent<ZNetView>().Destroy();
+                            try
+                            {
+                                Log.Info(Mob.gameObject.name);
+                                Mob.GetComponent<ZNetView>().Destroy();
+                            }
+                            catch
+                            {
+                                Log.Info("Failed to Destroy");
+                            }
                         }
-                        catch
-                        {
-                            Log.Info("Failed to Destroy");
-                        }
+                        NarcRandoMod.Instance.currentMobs.Clear();
+                        Log.Info("Enemies Cleared");
                     }
-                    NarcRandoMod.Instance.currentMobs.Clear();
-                    Log.Info("Enemies Cleared");
                 }
             }
         }

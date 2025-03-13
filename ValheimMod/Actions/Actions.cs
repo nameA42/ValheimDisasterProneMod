@@ -52,10 +52,11 @@ namespace ValheimTwitch.Events
         public List<Act> actions = new List<Act>
         {
             new Act("puke", 1f, "player"), new Act("heal", 1f, "player"), new Act("meteor", 1f, "player"), 
-            new Act("baby", 1f, "player"), new Act("regeneration", 1f, "player"), 
+            new Act("baby", 1f, "player"), new Act("regeneration", 1f, "player"),
             //new Act("warp", 1f, "player"), 
             new Act("moongrav", 1f, "player"),
-            new Act("fish", 1f, "spawn"), new Act("skeleton", 1f, "spawn"), new Act("troll", 1.2f, "spawn"), new Act("dragon", 0.1f, "spawn"),
+            new Act("fish", 1f, "spawn"), new Act("skeleton", 1f, "spawn"), new Act("troll", 1.2f, "spawn"),
+            new Act("dragon", 0.1f, "spawn"), new Act("logs", 1f, "spawn"),
             new Act("thunderstorm", 1f, "weather"), new Act("blizzard", 0.6f, "weather")
         };
         public Act PickAction()
@@ -88,11 +89,11 @@ namespace ValheimTwitch.Events
 
         public static void incrementUp()
         {
-            NarcRandoMod.Instance.worldLevel += 1;
+            NarcRandoMod.Instance.worldLevel = Math.Min(6, NarcRandoMod.Instance.worldLevel + 1);
         }
         public static void incrementDown()
         {
-            NarcRandoMod.Instance.worldLevel -= 1;
+            NarcRandoMod.Instance.worldLevel = Math.Max(0, NarcRandoMod.Instance.worldLevel - 1);
         }
         internal static void RunAction(string name = "")
         {
@@ -109,15 +110,15 @@ namespace ValheimTwitch.Events
                 {
                     case "spawn":
                         SpawnCreatureAction.Run(typ.act);
-                        Log.Info("ran Spawn");
+                        Log.Info("ran Spawn with" + typ.act);
                         break;
                     case "weather":
                         ChangeEnvironmentAction.Run(typ.act);
-                        Log.Info("ran Enviro");
+                        Log.Info("ran Enviro with" + typ.act);
                         break;
                     case "player":
                         PlayerAction.Run(typ.act);
-                        Log.Info("ran Player");
+                        Log.Info("ran Player with" + typ.act);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();

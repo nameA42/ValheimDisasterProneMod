@@ -45,9 +45,11 @@ namespace NarcRandomMod
         public bool WarpingLock = false;
         public bool Vommiting = false;
         public bool VomitLock = false;
+        public bool Logging = false;
+        public bool LogLock = false;
         public bool falldmg = true;
 
-        public int worldLevel = 1;
+        public int worldLevel = 0;
 
         public List<Character> currentMobs = new List<Character>();
 
@@ -102,7 +104,7 @@ namespace NarcRandomMod
                     ConsoleUpdatePatch.AddAction(PlayerAction.Meteor);
                     Log.Info("Meteor");
                 }
-                if (Input.GetKeyDown(KeyCode.KeypadDivide))
+                if (Input.GetKeyDown(KeyCode.KeypadDivide) | Input.GetKeyDown(KeyCode.Semicolon))
                 {
                     Actions.RunAction();
                 }
@@ -121,6 +123,11 @@ namespace NarcRandomMod
                     Log.Info("MoonJump");
                     ConsoleUpdatePatch.AddAction(PlayerAction.Moon);
                 }
+                if (Input.GetKeyDown(KeyCode.Keypad5))
+                {
+                    Log.Info("Logig");
+                    NarcRandoMod.Instance.Logging = true;
+                }
                 if (Input.GetKeyDown(KeyCode.Keypad0))
                 {
                     SpawnCreatureAction.Run();
@@ -131,15 +138,16 @@ namespace NarcRandomMod
                     PlayerAction.Run();
                     Log.Info("Pact");
                 }
-                if (Input.GetKeyDown(KeyCode.KeypadMinus))
-                {
-                    PlayerAction.doMSG("Increasing World Level");
-                    Actions.incrementUp();
-                    Log.Info("LevelUp");
-                }
                 if (Input.GetKeyDown(KeyCode.KeypadPlus))
                 {
+                    Actions.incrementUp();
+                    PlayerAction.doMSG($"Increased World Level to: {NarcRandoMod.instance.worldLevel}");
+                    Log.Info("LevelUp");
+                }
+                if (Input.GetKeyDown(KeyCode.KeypadMinus))
+                {
                     Actions.incrementDown();
+                    PlayerAction.doMSG($"Decreased World Level to: {NarcRandoMod.instance.worldLevel}");
                     Log.Info("LevelDown");
                 }
                 if (Input.GetKeyDown(KeyCode.KeypadMultiply))
