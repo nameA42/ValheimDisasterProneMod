@@ -11,6 +11,7 @@ using ValheimTwitch.Patches;
 using System.Collections.Generic;
 using static Interpolate;
 using UnityEngine.PlayerLoop;
+using System.Threading.Tasks;
 
 namespace NarcRandomMod
 {
@@ -178,14 +179,14 @@ namespace NarcRandomMod
                 {
                     Actions.RunAction();
                     instance.delay = 0f;
-                    if(instance.Smol)
+                    if (instance.Smol)
                     {
                         Player.m_localPlayer.transform.localScale = new Vector3(1f, 1f, 1f);
                         instance.Smol = false;
                     }
                 }
 
-                if (!instance.timMsgLock & Player.m_localPlayer != null & instance.delay%10 > 9.95)
+                if (!instance.timMsgLock & Player.m_localPlayer != null & instance.delay % 10 > 9.95)
                 {
                     var type1 = MessageHud.MessageType.TopLeft;
                     var msg = $"Time Till next Disaster:" + (int)(120f - instance.delay);
@@ -223,5 +224,14 @@ namespace NarcRandomMod
             Player.m_localPlayer.Message(type1, $"{msg}\n");
         }
 
+        [HarmonyPatch(typeof(Player), "OnDeath")]
+        public static class PlayerODAdd
+        {
+            public static void Postfix(Player __instance)
+            {
+                NarcRandoMod.Instance.Toggle(false);
+                Task.Delay(60000).ContinueWith(t => NarcRandoMod.Instance.Toggle(true));
+            }
+        }
     }
 }
