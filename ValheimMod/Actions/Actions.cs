@@ -82,9 +82,11 @@ namespace ValheimTwitch.Events
     {
         public static void writeToFile(string s)
         {
-            string path = Directory.GetCurrentDirectory() + "/DisasterProne.txt";
-            Log.Warning("Wrote to path: " + path);
-            File.WriteAllLines(path, new string[]{s});
+            Log.Info("Start Time before write" + System.DateTime.Now);
+            Log.Warning("Wrote to path: " + NarcRandoMod.Instance.path);
+            File.OpenWrite(s);
+            File.WriteAllLines(NarcRandoMod.Instance.path, new string[]{s});
+            Log.Info("End Time after write" + System.DateTime.Now);
         }
 
         public static void incrementUp()
@@ -105,7 +107,9 @@ namespace ValheimTwitch.Events
                 {
                     typ = help.actions.Find(x => x.act == name);
                 }
+                Log.Info("Current Time before write" + System.DateTime.Now);
                 writeToFile($"{typ.act}");
+                Log.Info("After Writing" + System.DateTime.Now);
                 switch (typ.type)
                 {
                     case "spawn":

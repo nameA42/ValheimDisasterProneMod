@@ -85,6 +85,11 @@ namespace ValheimTwitch.Helpers
                     return;
                 }
 
+                var log = instance.GetComponent<TreeLog>();
+                if(log != null)
+                {
+                    NarcRandoMod.Instance.currentLogs.Add(log);
+                }
                 var character = instance.GetComponent<Character>();
                 NarcRandoMod.Instance.currentMobs.Add(character);
 

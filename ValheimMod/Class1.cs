@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using static Interpolate;
 using UnityEngine.PlayerLoop;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace NarcRandomMod
 {
@@ -48,11 +49,15 @@ namespace NarcRandomMod
         public bool VomitLock = false;
         public bool Logging = false;
         public bool LogLock = false;
+        public bool gigaLock = false;
         public bool falldmg = true;
 
         public int worldLevel = 0;
+        public string path = Directory.GetCurrentDirectory() + "/DisasterProne.txt";
 
         public List<Character> currentMobs = new List<Character>();
+        public List<Fish> currentFish = new List<Fish>();
+        public List<TreeLog> currentLogs = new List<TreeLog>();
 
         private static NarcRandoMod instance;
 
@@ -128,6 +133,31 @@ namespace NarcRandomMod
                 {
                     Log.Info("Logig");
                     NarcRandoMod.Instance.Logging = true;
+                }
+                if (Input.GetKeyDown(KeyCode.Keypad6))
+                {
+                    Log.Info("Fishig");
+                    NarcRandoMod.Instance.fishig = true;
+                }
+                if (Input.GetKeyDown(KeyCode.Keypad7))
+                {
+                    Log.Info("SuperLogs");
+                    ConsoleUpdatePatch.AddAction(SpawnCreatureAction.GigaTree);
+                }
+                if (Input.GetKeyDown(KeyCode.Keypad8))
+                {
+                    Log.Info("SuperFish");
+                    ConsoleUpdatePatch.AddAction(SpawnCreatureAction.GigaFish);
+                }
+                if (Input.GetKeyDown(KeyCode.Keypad9))
+                {
+                    Log.Info("Troll");
+                    ConsoleUpdatePatch.AddAction(SpawnCreatureAction.Trollig);
+                }
+                if(Input.GetKeyDown(KeyCode.KeypadPeriod))
+                {
+                    Log.Info("clearing");
+                    ConsoleUpdatePatch.AddAction(SpawnCreatureAction.NoLogsorFish);
                 }
                 if (Input.GetKeyDown(KeyCode.Keypad0))
                 {

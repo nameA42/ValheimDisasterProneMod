@@ -183,7 +183,7 @@ namespace ValheimTwitch.Events
                 var velmod = UnityEngine.Random.Range(78f, 86f);
                 P_Meteor.Setup(Player.m_localPlayer, (vector2 - GO_Meteor.transform.position) * velmod, -1f, hitData, null, null);
                 HitData hitData1 = new HitData();
-                var pdmgMod = 1f;
+                var pdmgMod = (3f+NarcRandoMod.Instance.worldLevel)/5f;
                 hitData1.m_damage.m_fire = UnityEngine.Random.Range(10f, 15f) * pdmgMod;
                 hitData1.m_pushForce = 30f;
                 B_Meteor.Setup(new Character(), (vector2 - GO_Meteor.transform.position) * velmod, -1f, hitData1, null, null);

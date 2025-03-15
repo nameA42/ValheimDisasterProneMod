@@ -144,6 +144,59 @@ namespace ValheimTwitch.Events
             }
         }
 
+        public static void GigaFish()
+        {
+            for (int i = 0; i < 100; i++)
+            {
+                ConsoleUpdatePatch.AddAction(() => Prefab.Spawn("Fish1", 1, 10, false, above: true));
+            }
+        }
+
+        public static void GigaTree()
+        {
+            for (int i = 0; i < 100; i++)
+            {
+                ConsoleUpdatePatch.AddAction(() => Prefab.Spawn("beech_log_half", 1, 10, false, above: true));
+            }
+        }
+        public static void Trollig()
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                ConsoleUpdatePatch.AddAction(() => Prefab.Spawn("Troll", 1, 10, false));
+            }
+        }
+        public static void NoLogsorFish()
+        {
+            Fish[] fish = UnityEngine.Object.FindObjectsOfType<Fish>();
+            foreach (Fish fsh in fish)
+            {
+                try
+                {
+                    Log.Info(fsh.gameObject.name);
+                    fsh.GetComponent<ZNetView>().Destroy();
+                }
+                catch
+                {
+                    Log.Info("Failed to Destroy");
+                }
+            }
+            TreeLog[] Logs = UnityEngine.Object.FindObjectsOfType<TreeLog>();
+            foreach (TreeLog lg in Logs)
+            {
+                try
+                {
+                    Log.Info(lg.gameObject.name);
+                    lg.GetComponent<ZNetView>().Destroy();
+                }
+                catch
+                {
+                    Log.Info("Failed to Destroy");
+                }
+            }
+            Log.Info("Fish and Logs Cleared");
+        }
+
         [HarmonyPatch(typeof(Player), "FixedUpdate")]
         public static class PlayerFUAdd
         {
@@ -156,11 +209,45 @@ namespace ValheimTwitch.Events
                 }
                 if (NarcRandoMod.Instance.fishig & NarcRandoMod.Instance.delay% 2 < 0.5 & !NarcRandoMod.Instance.fishigLock)
                 {
-                    for (int i = 0; i < 5; i++)
+                    for (int i = 0; i < 50; i++)
                     {
                         ConsoleUpdatePatch.AddAction(() => Prefab.Spawn("Fish1", 1, 10, false, above:true));
                     }
                     NarcRandoMod.Instance.fishigLock = true;
+                }
+                if(NarcRandoMod.Instance.fishig & NarcRandoMod.Instance.delay % 10 < 0.5)
+                {
+                    var type1 = MessageHud.MessageType.Center;
+                    var msg = $"Cleared Fish and Items\n";
+                    Player.m_localPlayer.Message(type1, $"{msg}");
+                    if (NarcRandoMod.Instance.currentMobs.Count > 0)
+                    {
+                        Log.Info("Running Clear on " + NarcRandoMod.Instance.currentMobs.Count);
+                        Fish[] fish = UnityEngine.Object.FindObjectsOfType<Fish>();
+                        foreach (Fish fsh in fish)
+                        {
+                            try
+                            {
+                                Log.Info(fsh.gameObject.name);
+                                fsh.GetComponent<ZNetView>().Destroy();
+                            }
+                            catch
+                            {
+                                Log.Info("Failed to Destroy");
+                            }
+                        }
+                        ItemDrop[] array2 = UnityEngine.Object.FindObjectsOfType<ItemDrop>();
+                        for (int i = 0; i < array2.Length; i++)
+                        {
+                            ZNetView component = array2[i].GetComponent<ZNetView>();
+                            if (component)
+                            {
+                                component.Destroy();
+                            }
+                        }
+                        NarcRandoMod.Instance.currentMobs.Clear();
+                        Log.Info("Fish and items Cleared");
+                    }
                 }
                 if (NarcRandoMod.Instance.fishig & NarcRandoMod.Instance.delay % 2 > 1)
                 {
@@ -187,6 +274,7 @@ namespace ValheimTwitch.Events
                 {
                     NarcRandoMod.Instance.Logging = false;
                     NarcRandoMod.Instance.LogLock = false;
+                    NarcRandoMod.Instance.gigaLock = false;
                 }
                 if (NarcRandoMod.Instance.Logging & NarcRandoMod.Instance.delay % 5 < 0.5 & !NarcRandoMod.Instance.LogLock)
                 {
@@ -196,9 +284,21 @@ namespace ValheimTwitch.Events
                     }
                     NarcRandoMod.Instance.LogLock = true;
                 }
-                if (NarcRandoMod.Instance.Logging & NarcRandoMod.Instance.delay % 10 > 1)
+                if (NarcRandoMod.Instance.Logging & NarcRandoMod.Instance.delay % 5 > 1)
                 {
                     NarcRandoMod.Instance.LogLock = false;
+                }
+                if (NarcRandoMod.Instance.Logging & NarcRandoMod.Instance.delay % 10 < 0.5 & !NarcRandoMod.Instance.gigaLock)
+                {
+                    for (int i = 0; i < 45; i++)
+                    {
+                        ConsoleUpdatePatch.AddAction(() => Prefab.Spawn("beech_log_half", 1, 5, false, above: true));
+                    }
+                    NarcRandoMod.Instance.gigaLock = true;
+                }
+                if (NarcRandoMod.Instance.Logging & NarcRandoMod.Instance.delay % 10 > 1)
+                {
+                    NarcRandoMod.Instance.gigaLock = false;
                 }
                 if (NarcRandoMod.Instance.delay >= 115)
                 {
@@ -219,6 +319,40 @@ namespace ValheimTwitch.Events
                         }
                         NarcRandoMod.Instance.currentMobs.Clear();
                         Log.Info("Enemies Cleared");
+                    }
+                    if(NarcRandoMod.Instance.currentLogs.Count > 0)
+                    {
+                        Log.Info("Running Clear on " + NarcRandoMod.Instance.currentLogs.Count);
+                        foreach (TreeLog log in NarcRandoMod.Instance.currentLogs)
+                        {
+                            try
+                            {
+                                Log.Info(log.gameObject.name);
+                                log.GetComponent<ZNetView>().Destroy();
+                            }
+                            catch
+                            {
+                                Log.Info("Failed to Destroy");
+                            }
+                        }
+                        NarcRandoMod.Instance.currentLogs.Clear();
+                        Log.Info("Logs Cleared");
+                    }
+                    Fish[] fish = UnityEngine.Object.FindObjectsOfType<Fish>();
+                    if(fish.Length > 0)
+                    {
+                        foreach (Fish fsh in fish)
+                        {
+                            try
+                            {
+                                Log.Info(fsh.gameObject.name);
+                                fsh.GetComponent<ZNetView>().Destroy();
+                            }
+                            catch
+                            {
+                                Log.Info("Failed to Destroy");
+                            }
+                        }
                     }
                 }
             }
