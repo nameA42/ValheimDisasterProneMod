@@ -156,7 +156,7 @@ namespace ValheimTwitch.Events
         {
             for (int i = 0; i < 100; i++)
             {
-                ConsoleUpdatePatch.AddAction(() => Prefab.Spawn("beech_log_half", 1, 10, false, above: true));
+                ConsoleUpdatePatch.AddAction(() => Prefab.Spawn("beech_log_half", 1, 5, false, above: true));
             }
         }
         public static void Trollig()
